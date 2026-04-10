@@ -45,6 +45,6 @@ where amount >100000;
 select sum(amount) as total_billed
 from claims_flat;
 
-#total_billed_grt_thn_100k/total_billed*100
+#total_billed_grt_thn_100k/total_billed*100.
 
 
