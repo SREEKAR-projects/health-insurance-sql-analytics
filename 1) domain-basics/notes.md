@@ -8,7 +8,7 @@ Health insurance protects individuals from high medical expenses by pooling risk
 
 
 
-\## Key Entities
+\## Key Entities.
 
 \- Member: person who receives treatment
 
