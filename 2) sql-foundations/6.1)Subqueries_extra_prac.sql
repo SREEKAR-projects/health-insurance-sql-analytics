@@ -35,8 +35,31 @@ group by a.analyst_id, a.name;
 
 select `name`, salary, (select avg(salary) from analysts), region
 from analysts a1
-where salary < (select avg(salary) from analysts a2 where a1.region = a2.region)
+where salary < (select avg(salary) from analysts a2 where a1.region = a2.region);
+
+select `name`, analyst_id from analysts where analyst_id not in 
+(select distinct f.analyst_id
+from analysts as a
+join fraud_cases as f
+on a.analyst_id = f.analyst_id);
+
+select *
+from fraud_cases
+where amount > (
+    select avg(amount)
+    from fraud_cases
+    where status = 'closed'
+);
 
 
+select 
+    a.analyst_id,
+    a.name,
+    count(f.case_id) as open_case_count
+from analysts a
+join fraud_cases f
+    on a.analyst_id = f.analyst_id
+where f.status = 'open'
+group by a.analyst_id, a.name;
 
 
