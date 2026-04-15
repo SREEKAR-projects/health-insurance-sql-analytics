@@ -24,7 +24,13 @@ select diagnosis_code, claim_amount
 from claims c1
 where claim_amount > ( select avg(claim_amount)
 from claims c2
-where c1.diagnosis_code = c2.diagnosis_code)
+where c1.diagnosis_code = c2.diagnosis_code);
+
+
+SELECT member_id
+FROM (select member_id,sum(claim_amount) as total from claims group by member_id) as cl_am
+where total > 200000
+
 
 
 
