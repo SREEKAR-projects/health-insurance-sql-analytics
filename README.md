@@ -1,4 +1,4 @@
-# Health Insurance Fraud Detection using SQL
+# Health Insurance Fraud Detection using SQL.
 
 ## Objective.
 
