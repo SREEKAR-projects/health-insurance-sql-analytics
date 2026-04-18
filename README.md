@@ -8,14 +8,14 @@ Analyze health insurance claims data to detect fraud patterns such as:
 * Inception fraud
 * High-value anomalies
 
-## Skills Demonstrated.
+## Skills Demonstrated..
 
 * SQL (JOINs, CTEs, Window Functions)
 * Fraud detection logic
 * Data cleaning
 * Business analysis
 
-## Key Insights.
+## Key Insights..
 
 * Identified duplicate claims for same member within 2 days
 * Found providers with unusually high average billing
