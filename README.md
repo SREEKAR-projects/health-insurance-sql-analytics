@@ -21,7 +21,7 @@ Analyze health insurance claims data to detect fraud patterns such as:
 * Found providers with unusually high average billing
 * Built composite fraud scoring system
 
-## Tools.
+## Tools..
 
 * MySQL
 
