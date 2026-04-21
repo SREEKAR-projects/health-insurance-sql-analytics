@@ -53,17 +53,41 @@ from providers;
 
 
 select*
-from (select p.provider_id, p.provider_name, c.claim_date, sum(c.claim_amount) as pr_cl
+from (select p.provider_id,sum(c.claim_amount) as pr_cl
 from providers as p
 join claims as c
 on p.provider_id = c.provider_id
 where claim_date like "2024-04%" 
-group by p.provider_id, p.provider_name, c.claim_date) as pr_spl
-where pr_cl > (select avg(claim_amount) from claims where claim_date like "2024-04%")
+group by p.provider_id, p.provider_name) as pr_spl
+where pr_cl > (select avg(claim_amount) from claims where claim_date like "2024-04%");
 
 
+SELECT *
+FROM (
+    SELECT provider_id, SUM(claim_amount) AS total
+    FROM claims
+    WHERE DATE_FORMAT(claim_date, '%Y-%m') = '2024-04'
+    GROUP BY provider_id
+) AS monthly_totals
+WHERE total > (
+    SELECT AVG(total)
+    FROM (
+        SELECT provider_id, SUM(claim_amount) AS total
+        FROM claims
+        WHERE DATE_FORMAT(claim_date, '%Y-%m') = '2024-04'
+        GROUP BY provider_id
+    ) t
+);
 
 
+select member_id
+from claims
+where claim_amount>100000;
+
+select provider_id, sum(claim_amount) as provider_amount_ttl
+from claims
+group by provider_id
+order by provider_amount_ttl desc
 
 
 
