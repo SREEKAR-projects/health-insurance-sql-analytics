@@ -80,19 +80,25 @@ WHERE total > (
 );
 
 
-select member_id
-from claims
-where claim_amount>100000;
-
-select provider_id, sum(claim_amount) as provider_amount_ttl
-from claims
-group by provider_id
-order by provider_amount_ttl desc
 
 
 
+SELECT m.member_name, m.city, c.claim_amount
+FROM members m
+JOIN claims c 
+ON m.member_id = c.member_id
+WHERE c.claim_amount = (
+    SELECT MAX(claim_amount) FROM claims
+);
 
 
+
+SELECT m.member_id, m.member_name
+FROM members m
+JOIN claims c 
+ON m.member_id = c.member_id
+GROUP BY m.member_id, m.member_name, m.policy_start_date
+HAVING DATEDIFF(MAX(c.claim_date), m.policy_start_date) <= 60;
 
 
 
