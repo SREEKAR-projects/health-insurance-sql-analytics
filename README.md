@@ -1,6 +1,6 @@
 # Health Insurance Fraud Detection using SQL.
 
-## Objective.
+## Objective..
 
 Analyze health insurance claims data to detect fraud patterns such as:
 
