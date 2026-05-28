@@ -4,6 +4,12 @@ select*
 from providers;
 
 select*
+from claims;
+
+select*
+from members;
+
+select*
 from claims_flat;
 
 SELECT claim_id
@@ -20,4 +26,16 @@ where datediff(claim_date,policy_start) > 30;  #in this table claim_amount is am
 
 select provider,avg(amount)
 from claims_flat
-where avg(amount) >= 1.4*(select avg(amount) from claims_flat)
+group by provider
+having avg(amount) >= 1.4*(select avg(amount)
+from claims_flat);
+
+SELECT m.member_id,
+       m.member_name,
+       SUM(c.claim_amount) AS total_filed
+FROM members m
+JOIN claims c
+ON m.member_id = c.member_id
+WHERE m.city = 'Hyderabad'
+GROUP BY m.member_id, m.member_name
+ORDER BY total_filed DESC;
