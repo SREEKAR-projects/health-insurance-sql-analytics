@@ -24,4 +24,14 @@ where days_gap <10;
 SELECT m.city,c.member_id,c.claim_amount , dense_rank() over (partition by m.city order by c.claim_amount desc) as ranking
 FROM claims as c
 join members as m
-on c.member_id = m.member_id
+on c.member_id = m.member_id;
+
+
+ 
+SELECT 
+    provider_id, 
+    claim_date, claim_amount,
+    SUM(claim_amount) OVER (PARTITION BY provider_id ORDER BY claim_date) AS rolling_total
+FROM claims;
+
+
