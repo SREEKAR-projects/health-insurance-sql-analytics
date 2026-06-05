@@ -34,4 +34,27 @@ SELECT
     SUM(claim_amount) OVER (PARTITION BY provider_id ORDER BY claim_date) AS rolling_total
 FROM claims;
 
+with next_amt as (SELECT member_id, claim_date, claim_amount,
+LEAD(claim_amount) OVER (PARTITION BY member_id ORDER BY claim_date) AS next_claim_amount
+from claims)
+select*
+from next_amt
+where next_claim_amount >= 2*(claim_amount);
+
+WITH ordered AS (
+    SELECT *,
+           ROW_NUMBER() OVER (
+               PARTITION BY member_id
+               ORDER BY claim_date
+           ) AS rn,
+           COUNT(*) OVER (
+               PARTITION BY member_id
+           ) AS total_claims
+    FROM claims
+)
+
+
+
+
+
 
