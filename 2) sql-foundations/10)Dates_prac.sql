@@ -51,7 +51,7 @@ ORDER BY month;
 
 with cte_2 as (select claim_id, claim_date, dayofweek(claim_date) as what_day
 from claims)
-select claim_id, claim_date, dayofweek(claim_date) as what_day, case when what_day = 1 then "Sunday" when what_day = 7  then "Saturday" else "weekday" end as day_name
+select claim_id, claim_date, dayofweek(claim_date) as what_day, case when what_day = 1 then 1  when what_day = 7  then 1 else 0 end as day_name
 from cte_2 
 where what_day = 1 or what_day = 7;
 

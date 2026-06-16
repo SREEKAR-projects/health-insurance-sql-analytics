@@ -17,7 +17,7 @@ group by city
 order by avg_amt desc;
 
 select member_id,
-member_name, count(member_id) as cntt, "duplicates" as verdict
+member_name, count(member_id) as cntt
 FROM claims_flat 
 group by  member_id, member_name
 having cntt>1;
