@@ -30,3 +30,30 @@ SELECT *,
     END AS risk_tier
 FROM scored
 ORDER BY fraud_score DESC;
+
+
+CREATE temporary TABLE flagging
+with prov_data as (select p.provider_id,count(c.claim_id) as cntt,sum(c.claim_amount) as total, avg(c.claim_amount) as avg_amt, ROUND(
+    SUM(CASE WHEN c.claim_amount > 100000 THEN 1 ELSE 0 END)
+    * 100.0
+    / COUNT(*),
+    2) AS pct_high_value_claims, ROUND(
+    SUM(CASE
+            WHEN claim_amount % 50000 = 0
+            THEN 1
+            ELSE 0
+        END)
+    * 100.0
+    / COUNT(*),
+    2
+) AS pct_round_number_claims
+    from providers as p
+    join claims as c
+    on p.provider_id = c.provider_id
+    group by p.provider_id)
+    select provider_id,cntt,total,avg_amt,pct_high_value_claims,pct_round_number_claims,case when pct_high_value_claims > 80.00 then "High" when pct_high_value_claims between 30 and 79 then "medium" else "low" end as risk_flag
+    from prov_data;
+
+select provider_id,cntt,total,avg_amt,pct_high_value_claims,pct_round_number_claims,risk_flag as risk_flag_1, case when pct_round_number_claims = 100.00 then "high" else "low" end as risk_flag_2
+ from flagging
+  order by cntt desc,pct_high_value_claims desc ,pct_round_number_claims desc
