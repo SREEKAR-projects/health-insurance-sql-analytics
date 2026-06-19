@@ -191,3 +191,18 @@ ELSE 'Low' END AS risk_tier
 FROM scored
 ORDER BY fraud_score DESC;
 
+create temporary table r3 as
+select total_claims,approved_count,rejected_count,(select sum(case when risk_tier = 'High' or 'Medium' then 1 else 0 end  ) from r2) as total_top_priority_cases, ROW_NUMBER() OVER () as rn
+from r1;
+
+create temporary table r4 as
+select provider_id, count(claim_id), ROW_NUMBER() OVER () as rn
+from claims
+where month(claim_date) = 1
+group by provider_id
+order by count(claim_id) desc;
+
+select*
+from r4
+left join r3
+on r3.rn = r4.rn
