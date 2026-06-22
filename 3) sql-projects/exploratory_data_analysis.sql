@@ -59,3 +59,87 @@ set claim_date = str_to_date(claim_date,'%Y-%m-%d');
 
 alter table claims_messy_staging
 modify column claim_date date;
+
+select*
+from claims_messy_staging;
+SELECT *
+FROM claims_messy_staging c1
+JOIN claims_messy_staging c2
+    ON c1.member_id = c2.member_id
+   AND ABS(c1.claim_amount) = c2.claim_amount
+WHERE c1.claim_amount < 0
+  AND c2.claim_amount > 0;
+  
+  
+  
+  CREATE VIEW claim_transactions AS
+SELECT *,
+       CASE
+           WHEN claim_amount < 0
+           THEN 'REVERSAL'
+           ELSE 'CLAIM'
+       END AS transaction_type
+FROM claims_messy_staging;
+
+select*
+from claim_transactions;
+
+
+SELECT
+    provider_id,
+    COUNT(*) AS total_transactions,
+    SUM(CASE WHEN claim_amount < 0 THEN 1 ELSE 0 END) AS reversals,
+    ROUND(
+        100 * SUM(CASE WHEN claim_amount < 0 THEN 1 ELSE 0 END)
+        / COUNT(*), 2
+    ) AS reversal_rate
+FROM claims_messy_staging
+GROUP BY provider_id
+ORDER BY reversal_rate DESC;
+
+select provider_id,CASE
+    WHEN diagnosis_code = ''
+         AND procedure_code IS NOT NULL
+    THEN 1 WHEN diagnosis_code !=''
+         AND procedure_code IS NULL
+    THEN 1 ELSE 0
+END as billing_suspects
+from claims_messy_staging
+order by provider_id,billing_suspects desc;
+
+#Different
+
+WITH flags AS (
+SELECT
+c.provider_id,
+c.claim_amount,
+
+-- Flag 1: High value claim
+CASE WHEN c.claim_amount > 100000 THEN 1 ELSE 0 END AS high_value_flag,
+-- Flag 2: Round number billing
+CASE WHEN c.claim_amount % 50000 = 0 THEN 1 ELSE 0 END AS round_number_flag,
+-- Flag 3: Billing for procedure without diagnosis
+CASE WHEN diagnosis_code = '' AND procedure_code IS NOT NULL THEN 1 WHEN diagnosis_code !='' AND procedure_code IS NULL THEN 1 ELSE 0 END as diag_proc_mismatches,
+-- Flag 4: Threshold Manupulation
+CASE WHEN claim_amount >= 0.95 * 100000 AND claim_amount < 100000 THEN 1 ELSE 0 END AS threshold_flag,
+-- Flag 5: Inflated costs
+CASE WHEN claim_amount >= 0.95 * 100000 AND claim_amount < 100000 THEN 1 ELSE 0 END AS inflated_costs
+
+FROM claims_messy_staging c
+JOIN members_messy_staging m ON c.member_id = m.member_id
+
+),
+scored AS (
+SELECT *,
+(high_value_flag + round_number_flag) AS fraud_score
+FROM flags
+)
+SELECT *, CASE
+WHEN fraud_score >= 3 THEN 'Critical'
+WHEN fraud_score = 2 THEN 'High'
+WHEN fraud_score = 1 THEN 'Medium'
+ELSE 'Low' END AS risk_tier
+FROM scored
+ORDER BY fraud_score DESC;
+
+
