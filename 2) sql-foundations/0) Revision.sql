@@ -88,3 +88,69 @@ FROM (
     GROUP BY c.member_id, m.policy_start_date
 ) t
 WHERE DATEDIFF(t.last_claim_date, t.policy_start_date) <= 60;
+
+
+
+
+
+
+
+
+select category,  
+    ROUND((SUM(success_count) * 100.0 / SUM(total_count)),2) AS success_by_cat
+FROM metrics_1
+GROUP BY category
+order by success_by_cat desc;
+
+select category,  
+    ROUND((SUM(failure_count) * 100.0 / SUM(total_count)),2) AS failure_by_cat
+FROM metrics_1
+GROUP BY category
+order by failure_by_cat desc;
+
+
+select Round((sum(new_value-old_value)*100/sum(old_value)),2) as growth_prec
+from metrics_1;
+
+WITH cte_1 AS (
+    SELECT *, 
+        ROUND((new_value-old_value) * 100.0 / old_value, 2) AS growth_perc
+    FROM metrics_1
+)
+SELECT *, 
+    CASE WHEN growth_perc > 40 THEN 'Investigate' ELSE 'N/A' END AS flagging
+FROM cte_1
+ORDER BY growth_perc DESC;
+
+
+with cte_2 as (select category,  
+    ROUND((SUM(success_count) * 100.0 / SUM(total_count)),2) AS success_by_cat
+FROM metrics_1
+GROUP BY category)
+select*, dense_rank() over(order by success_by_cat desc) as ranking
+from cte_2
+order by success_by_cat desc;
+
+
+select category,  
+    ROUND((SUM(failure_count) * 100.0 / SUM(total_count)),2) AS failure_by_cat
+FROM metrics_1
+GROUP BY category
+having failure_by_cat > 25
+order by failure_by_cat desc;
+
+select category, round(total_count*100/(select sum(total_count) from metrics_1),2) as each_cats_per
+from metrics_1
+order by each_cats_per desc;
+
+
+
+WITH cte_1 AS (
+    SELECT *, 
+        ROUND((new_value-old_value) * 100.0 / old_value, 2) AS growth_perc
+    FROM metrics_1
+)
+SELECT *, 
+    CASE WHEN growth_perc > 40 THEN 'Investigate' WHEN growth_perc BETWEEN 10 and 20 THEN 'Watch' WHEN growth_perc BETWEEN 20 and 40 THEN 'Review'  ELSE 'Normal' END AS flagging
+FROM cte_1
+ORDER BY growth_perc DESC;
