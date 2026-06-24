@@ -143,3 +143,8 @@ FROM scored
 ORDER BY fraud_score DESC;
 
 
+
+
+
+
+
