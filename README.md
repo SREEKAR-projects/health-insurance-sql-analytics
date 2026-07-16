@@ -1,4 +1,4 @@
-# Provider Fraud Audit — Q4 2024..
+# Provider Fraud Audit — Q4 2024.
 
 Health insurance fraud detection analysis identifying high-risk providers through systematic signal analysis and composite fraud scoring.
 
